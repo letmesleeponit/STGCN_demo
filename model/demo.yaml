@@ -1,0 +1,11 @@
+device:
+- 0
+model: net.st_gcn.Model
+model_args:
+  edge_importance_weighting: true
+  graph_args:
+    layout: mediapipe_49
+    strategy: spatial
+  in_channels: 2
+  num_class: 7
+weights: /home/jerry/STGCN/model/epoch50_model.pt
