@@ -2,9 +2,11 @@ import os, sys, pathlib
 import cv2
 import mediapipe as mp
 from collections import deque
+from tqdm import tqdm
+import time
 import numpy as np
 import torch
-sys.path.insert(1, "/home/jerry/st-gcn_ori") # Your STGCN dirpath
+sys.path.insert(1, "st-gcn") # Your STGCN dirpath
 from processor.io import IO
 
 ### Transform the output format of mp to the one we are accustomed 
@@ -92,7 +94,6 @@ def st_gcn_hand(cha_size:int, skele_size:int, p:IO, storage:deque):
     label_predict = label_recover[: len(storage["data"])]
     return label_predict[-1]
 
-
 ### mediapipe parameter setting
 vid_path = os.path.join(pathlib.Path(__file__).parent, 'vid.mp4')
 cap = cv2.VideoCapture(vid_path)
@@ -112,9 +113,10 @@ p = IO(argv) # build the STGCN object
 inWidth = 1920
 inHeight = 1080
 vid_path = os.path.join(pathlib.Path(__file__).parent, 'output.mp4')
-vid_writer = cv2.VideoWriter(vid_path, cv2.VideoWriter_fourcc('M','J','P','G'), 10, (inWidth,inHeight))
-cv2.namedWindow('real_time', cv2.WINDOW_NORMAL)
-cv2.setWindowProperty('real_time', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+vid_writer = cv2.VideoWriter(vid_path, cv2.VideoWriter_fourcc(*"mp4v"), 10, (inWidth,inHeight))
+tqdm_progress = tqdm(total=int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))
+# cv2.namedWindow('real_time', cv2.WINDOW_NORMAL)
+# cv2.setWindowProperty('real_time', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 ### Use mediapipe extract the skeleton feature
 with mp_hands.Hands(
@@ -128,7 +130,7 @@ min_tracking_confidence=0) as pose:
     while cap.isOpened():
         success, image = cap.read()
         if not success:
-            print("The video does not exist.")
+            print("The video does not exist or ending.")
             break
 
         ## To improve performance, optionally mark the image as not writeable to
@@ -205,9 +207,10 @@ min_tracking_confidence=0) as pose:
             paste_count = 0
             
             vid_writer.write(frame_draw)
-            cv2.imshow('real_time', frame_draw)
+            tqdm_progress.update(1)
+            # cv2.imshow('real_time', frame_draw)
             
-            if cv2.waitKey(5) & 0xFF == ord('q'):        
-                vid_writer.release()
-                cv2.destroyAllWindows()
-                exit() 
+            # if cv2.waitKey(5) & 0xFF == ord('q'):        
+                # vid_writer.release()
+                # cv2.destroyAllWindows()
+                # exit()

@@ -8,4 +8,4 @@ model_args:
     strategy: spatial
   in_channels: 2
   num_class: 7
-weights: /home/jerry/STGCN/model/epoch50_model.pt
+weights: model/epoch50_model.pt
