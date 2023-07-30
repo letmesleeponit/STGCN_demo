@@ -54,3 +54,6 @@ pip install opencv-python-headless==4.6.0.66
 ```
 python demo.py
 ```
+
+## Citation
+[STGCN](https://github.com/yysijie/st-gcn)
